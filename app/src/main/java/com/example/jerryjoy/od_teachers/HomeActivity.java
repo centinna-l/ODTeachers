@@ -156,11 +156,12 @@ public class HomeActivity extends AppCompatActivity implements HandlerOdForm.MyC
     @Override
     public void handleReject(int position) {
         mDataBase=FirebaseDatabase.getInstance().getReference(email).child(keys.get(position));
-        adapter.notifyItemRemoved(position);
-        rview.setAdapter(adapter);
         mDataBase.removeValue();
         mDataBase=FirebaseDatabase.getInstance().getReference(names.get(position)).child("Hod");
         mDataBase.push().setValue("Reject");
+        adapter.notifyItemRemoved(position);
+        rview.setAdapter(adapter);
+
     }
 
 }
