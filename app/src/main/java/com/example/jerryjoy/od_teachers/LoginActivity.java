@@ -6,6 +6,7 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -14,7 +15,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity {
@@ -57,8 +57,9 @@ public class LoginActivity extends AppCompatActivity {
                             updateUI();
                         }
                         else{
-                            FirebaseAuthException e=(FirebaseAuthException)task.getException();
-                            Toast.makeText(LoginActivity.this, "Error"+e.getMessage(), Toast.LENGTH_SHORT).show();
+                            //FirebaseAuthException e=(FirebaseAuthException)task.getException();
+                            Log.e("Signup Error", "onCancelled", task.getException());
+                            Toast.makeText(LoginActivity.this, "Error", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

@@ -31,12 +31,14 @@ public class HomeActivity extends AppCompatActivity implements HandlerOdForm.MyC
     private RecyclerView rview;
     private RecyclerView.Adapter adapter;
     private LinearLayoutManager manager;
-    private ArrayList<String> keys=new ArrayList<>();
-    private ArrayList<String> names=new ArrayList<>();
-    private ArrayList<String> regno=new ArrayList<>();
-    private ArrayList<String> sec=new ArrayList<>();
-    private ArrayList<String> reasons=new ArrayList<>();
-    private ArrayList<String> dates=new ArrayList<>();
+    private ArrayList<String> keys = new ArrayList<>();
+    private ArrayList<String> names = new ArrayList<>();
+    private ArrayList<String> regno = new ArrayList<>();
+    private ArrayList<String> sec = new ArrayList<>();
+    private ArrayList<String> reasons = new ArrayList<>();
+    private ArrayList<String> dates = new ArrayList<>();
+    private ArrayList<String> emailNames = new ArrayList<>();
+    private ArrayList<String> statss=new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,42 +55,44 @@ public class HomeActivity extends AppCompatActivity implements HandlerOdForm.MyC
         mDataBase = FirebaseDatabase.getInstance().getReference().child(email);
         mDataBase.keepSynced(true);
         Toast.makeText(this, email, Toast.LENGTH_SHORT).show();
-            mDataBase.addChildEventListener(new ChildEventListener() {
-                @Override
-                public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                        ApplicationHandler applicationHandler = dataSnapshot.getValue(ApplicationHandler.class);
-                        names.add(applicationHandler.getName());
-                        regno.add(applicationHandler.getRegNo());
-                        sec.add(applicationHandler.getSec());
-                        reasons.add(applicationHandler.getReason());
-                        dates.add(applicationHandler.getTo());
-                        keys.add(dataSnapshot.getKey());
-                    adapter = new HandlerOdForm(HomeActivity.this, names, regno, sec, reasons, dates, HomeActivity.this);
-                    manager = new LinearLayoutManager(HomeActivity.this, LinearLayoutManager.VERTICAL, false);
-                    rview.setLayoutManager(manager);
-                    rview.setAdapter(adapter);
-                }
+        mDataBase.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                ApplicationHandler applicationHandler = dataSnapshot.getValue(ApplicationHandler.class);
+                names.add(applicationHandler.getName());
+                regno.add(applicationHandler.getRegNo());
+                sec.add(applicationHandler.getSec());
+                reasons.add(applicationHandler.getReason());
+                dates.add(applicationHandler.getTo());
+                emailNames.add(applicationHandler.getEmailName());
+                statss.add(applicationHandler.getStats());
+                keys.add(dataSnapshot.getKey());
+                adapter = new HandlerOdForm(HomeActivity.this, names, regno, sec, reasons, dates, HomeActivity.this);
+                manager = new LinearLayoutManager(HomeActivity.this, LinearLayoutManager.VERTICAL, false);
+                rview.setLayoutManager(manager);
+                rview.setAdapter(adapter);
+            }
 
-                @Override
-                public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
-                }
+            }
 
-                @Override
-                public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
 
-                }
+            }
 
-                @Override
-                public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
-                }
+            }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                }
-            });
+            }
+        });
 
     }
 
@@ -128,25 +132,26 @@ public class HomeActivity extends AppCompatActivity implements HandlerOdForm.MyC
     public void handleAccept(int position) {
 
 
-            String name = names.get(position);
-            String reg = regno.get(position);
-            String reason = reasons.get(position);
-            String section = sec.get(position);
-            String date = dates.get(position);
-            Boolean status=true;
-            String classAdvisor=user.getEmail();
-            String from="";
-            String year="";
-            String dept="";
-            ApplicationHandler applicationHandler = new ApplicationHandler(name,reg, dept,section,year,reason,from, date,classAdvisor,status);
-        if (email.equals("hodcsevdp")){
-            mDataBase=FirebaseDatabase.getInstance().getReference(names.get(position)).child("HOD");
-            mDataBase.push().setValue("Approve");
+        String name = names.get(position);
+        String reg = regno.get(position);
+        String reason = reasons.get(position);
+        String section = sec.get(position);
+        String date = dates.get(position);
+        String emailName = emailNames.get(position);
+        String classAdvisor = user.getEmail();
+        String stat=statss.get(position);
+        String from = "";
+        String year = "";
+        String dept = "";
+        ApplicationHandler applicationHandler = new ApplicationHandler(name, reg, dept, section, year, reason, from, date, classAdvisor, emailName,stat);
+        if (email.equals("hodcsevdp")) {
+            mDataBase = FirebaseDatabase.getInstance().getReference().child(emailNames.get(position));
+            mDataBase.child(keys.get(position)).child("status").setValue("Approved By hod");
 
-        }
-        else {
+        } else {
+            Toast.makeText(this, keys.get(position), Toast.LENGTH_LONG).show();
             mDataBase = FirebaseDatabase.getInstance().getReference().child("hodcsevdp");
-            mDataBase.push().setValue(applicationHandler);
+            mDataBase.child(keys.get(position)).setValue(applicationHandler);
         }
 
         //Toast.makeText(this, "Key: "+keys.get(position), Toast.LENGTH_SHORT).show();
@@ -155,10 +160,15 @@ public class HomeActivity extends AppCompatActivity implements HandlerOdForm.MyC
 
     @Override
     public void handleReject(int position) {
-        mDataBase=FirebaseDatabase.getInstance().getReference(email).child(keys.get(position));
+        mDataBase = FirebaseDatabase.getInstance().getReference(email).child(keys.get(position));
         mDataBase.removeValue();
-        mDataBase=FirebaseDatabase.getInstance().getReference(names.get(position)).child("Hod");
-        mDataBase.push().setValue("Reject");
+        if (email.equals("hodcsevdp")) {
+            mDataBase = FirebaseDatabase.getInstance().getReference().child(emailNames.get(position));
+            mDataBase.child(keys.get(position)).child("status").setValue("Rejected By HoD");
+        } else {
+            mDataBase = FirebaseDatabase.getInstance().getReference().child(emailNames.get(position));
+            mDataBase.child(keys.get(position)).child("status").setValue("Rejected By Faculty Incharge");
+        }
         adapter.notifyItemRemoved(position);
         rview.setAdapter(adapter);
 

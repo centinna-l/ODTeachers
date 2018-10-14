@@ -18,7 +18,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".ForgotActivity" />
-        <activity android:name=".HoD"></activity>
     </application>
 
 </manifest>

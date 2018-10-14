@@ -33,6 +33,7 @@ public class HandlerOdForm extends RecyclerView.Adapter<HandlerOdForm.ViewHolder
 
     public static interface MyCallback {
         void handleAccept(int position);
+
         void handleReject(int position);
     }
 
