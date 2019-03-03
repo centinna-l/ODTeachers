@@ -18,6 +18,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ForgotActivity" />
+        <activity android:name=".LogsActivity"></activity>
     </application>
 
 </manifest>
